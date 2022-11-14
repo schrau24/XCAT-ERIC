@@ -1,39 +1,19 @@
-function viewTrajPseudoSpiral(k, nSlcs, matrix,app, fileInfo)
-
+function viewTrajPseudoSpiral(k, Sl, matrix, app)
+nArms = floor(app.nROperFrame/Sl);
 cla(app.TrajectoryPlot, 'reset');
 hold(app.TrajectoryPlot,'on');
-c = parula(8);  % 8 arms plotted
+c = parula(nArms);
 ylabel(app.TrajectoryPlot,'k_y');
 xlabel(app.TrajectoryPlot,'k_z');
-axis(app.TrajectoryPlot,'equal')
-ylim(app.TrajectoryPlot,[-5 matrix(1)+5])
-xlim(app.TrajectoryPlot,[-5 matrix(2)+5])
-count = 0;
-for i = 1:nSlcs*8
-    ky = squeeze(k(i,1));
-    kz = squeeze(k(i,2));
-    
-    if mod(i,nSlcs) == 1
-        count = count+1;
-    end
+axis(app.TrajectoryPlot,'square')
+ylim(app.TrajectoryPlot,[-1 matrix(1)+1])
+xlim(app.TrajectoryPlot,[-1 matrix(2)+1])
+for i = 1:nArms
+    ind = (i-1)*Sl+1:(i*Sl);
+    ky = squeeze(k(ind,1));
+    kz = squeeze(k(ind,2));
     scatter(app.TrajectoryPlot,kz,ky, '.',...
-        'MarkerFaceColor',c(count,:),'MarkerEdgeColor',c(count,:));
+        'MarkerFaceColor',c(i,:),'MarkerEdgeColor',c(i,:));
     
-    pause(0.05)
-    
-    if ~isempty(fileInfo)
-        frame = getframe(gcf);
-        im{i} = frame2im(frame);
-    end
-end
-
-if ~isempty(fileInfo)
-    for idx = 1:size(im,2)
-        [A,map] = rgb2ind(im{idx},256,'nodither');
-        if idx == 1
-            imwrite(A,map,'gifTest.gif','gif','LoopCount',Inf,'DelayTime',.012);
-        else
-            imwrite(A,map,'gifTest.gif','gif','WriteMode','append','DelayTime',.012);
-        end
-    end
+    pause(0.2)
 end

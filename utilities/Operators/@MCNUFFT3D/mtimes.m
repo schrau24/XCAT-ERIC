@@ -12,6 +12,7 @@ if a.adjoint,
         end
         ress(:,:,:,tt)=sum(res.*conj(a.b1),4)./sum(abs((a.b1)).^2,4); clear res
     end
+    ress(isnan(ress)) = 0;
 else
     % Cartesian image to multicoil non-Cartesian k-space
     for tt=1:size(bb,4),
@@ -22,5 +23,6 @@ else
             end
         end
     end
+    ress(isnan(ress)) = 0;
 end
 

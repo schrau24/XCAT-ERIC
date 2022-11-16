@@ -26,3 +26,4 @@ for i = 1:nStacksPerFrame
     zlabel(app.TrajectoryPlot,'k_z');
     pause(0.2)
 end
+legend(app.TrajectoryPlot,'readout','location','southeast')

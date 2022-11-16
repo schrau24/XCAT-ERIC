@@ -1,7 +1,6 @@
 function sg_signal_final = extractSG(app, kspace, isCartesian, isRadial)
 
-nCh = size(kspace,3);
-
+nSlcs = numel(unique(app.kz_samples(1,:)));
 % find center k-space indices
 if isCartesian
     kyy = squeeze(app.ky_samples(1,:)) - floor(app.matrixAP/2) - 1;
@@ -10,10 +9,10 @@ if isCartesian
     SG_ksp = abs(kspace(:,centerLineIdx,:));
     ZIP = SG_ksp;
 else
-    centerLineIdx = 1:app.matrixFH:size(kspace,2);
+    centerLineIdx = 1:nSlcs:size(kspace,2);
     % sort into slices
-    for sl = 1:app.matrixFH
-       ksp(:,:,sl,:) = permute(kspace(:,sl:app.matrixFH:end,:),[1 2 4 3]); 
+    for sl = 1:nSlcs
+       ksp(:,:,sl,:) = permute(kspace(:,sl:nSlcs:end,:),[1 2 4 3]); 
     end
     if isRadial
         ZIP = squeeze(ksp(round(size(ksp,1)/2),:,:,:));

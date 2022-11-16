@@ -2,7 +2,6 @@ function [kspaceDCESorted, trajDCESorted] = sortDCEKspace(kspace, app, isCartesi
 
 % re-sort for DCE, use timings from trajectory calculation to be consistent
 nROperFrame = app.nROperFrame;
-
 nFE = size(kspace,2);
 
 % WRITE LABEL

@@ -1,4 +1,4 @@
-function [outputImg] = nonCartesian_CS(app, kspace, trajSorted, kspaceSorted, TVlambda)
+function [outputImg] = nonCartesian_CS(app, kspace, trajSorted, kspaceSorted, TVlambda, useSG)
 warning('off','all')
 %% Coil sensitivity calculation
 disp('Calculating coil sensitivity..')
@@ -28,7 +28,7 @@ nSlcs = length(unique(squeeze(z(1,:,1,1))));
 nRO = size(kspaceSorted,2)/nSlcs;
 kk = zeros(size(kspaceSorted,1),nRO,size(b1,4),size(kspaceSorted,4),app.matrixFH);
 for sl = 1:nSlcs
-   kk(:,:,:,:,sl) = kspaceSorted(:,sl:nSlcs:end,:,:);
+    kk(:,:,:,:,sl) = kspaceSorted(:,sl:nSlcs:end,:,:);
 end
 kspaceSorted2 = permute(kk,[1 2 5 3 4]); clear kk;
 [~,kz_ord] = sort(app.kz_samples(1,1:nSlcs));
@@ -71,6 +71,25 @@ parfor sl = 1:nSl
 end
 delete(gcp('nocreate'))
 
+% calculate weights for respiratory soft-gating and sort
+ntres = 4;
+[nx, nline, nt] = size(Traj_nt);
+nline2 = floor(nline/ntres);
+SoftWeight = ones(nx,nline,nt,nCh);
+respSignal = app.sg_signal(1:nSlcs:end);
+if useSG    % the soft-gating
+    Res_Signal_tmp = reshape(respSignal(1:nt*nline),[nline,nt]);
+    for ii = 1:nt
+        [~,index] = sort(Res_Signal_tmp(:,ii),'descend');
+        Traj_nt(:,:,ii) = Traj_nt(:,index,ii);
+        DensityComp_nt(:,:,ii) = DensityComp_nt(:,index,ii);
+        kdata_nt(:,:,:,:,ii) = kdata_nt(:,index,:,:,ii);
+    end
+    for jj = 1:ntres
+        SoftWeight(:,(jj-1)*nline2+1:jj*nline2,:,:) = (1/4)^(jj-1);
+    end
+end
+
 if app.CompressedsensingreconCheckBox.Value
     %% CS reconstruction
     % Load into local variables to avoid communication overhead
@@ -88,7 +107,7 @@ if app.CompressedsensingreconCheckBox.Value
         param = [];
         
         % permute the soft-weighting
-        param.SG = 1;%double(permute(SoftWeight,[1,2,5,4,3]));
+        param.SG = double(permute(SoftWeight,[1,2,5,4,3]));
         
         % Limit data for MCNUFFT3D operator to one slice for enabling
         % multithreaded calculation of slices.

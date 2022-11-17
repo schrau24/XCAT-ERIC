@@ -30,7 +30,13 @@ bs3=bs;  %z-block size
 wsmall=zeros(nc,round(nx./st),round(ny./st),round(nz./st));
 cmapsmall=zeros(nc,round(nx./st),round(ny./st),round(nz./st));
 
-for z=st:st:nz
+if nz==1
+    stz = 1;
+else
+    stz = st;
+end
+
+for z=stz:stz:nz
     for x=st:st:nx
         for y=st:st:ny
             
@@ -48,8 +54,8 @@ for z=st:st:nz
             lx1=length(xmin1:xmax1);
             lz1=length(zmin1:zmax1);
             m1=reshape(yn(:,xmin1:xmax1,ymin1:ymax1,zmin1:zmax1),nc,lx1*ly1*lz1);
-           
-          
+            
+            
             m=m1*m1'; %signal covariance
             
             % eignevector with max eigenvalue for optimal combination
@@ -66,8 +72,8 @@ for z=st:st:nz
             mf=mf.*exp(-1i*angle(mf(maxcoil)));
             normmf=normmf.*exp(-1i*angle(normmf(maxcoil)));
             
-            wsmall(:,x./st,y./st,z./st)=mf;
-            cmapsmall(:,x./st,y./st,z./st)=normmf;
+            wsmall(:,x./st,y./st,z./stz)=mf;
+            cmapsmall(:,x./st,y./st,z./stz)=normmf;
         end
     end
 end
@@ -82,10 +88,15 @@ sdkz = linspace(1,round(nz./st),nz);
 % pixels between +1 and -1 pixels.
 wfull = zeros(nc,nx,ny,nz);
 cmap = zeros(nc,nx,ny,nz);
-for i=1:nc
-    wfull(i,:,:,:)= conj(interp3(squeeze(abs(wsmall(i,:,:,:))),Xq,Yq,Zq,'bilinear').*exp(1i.*interp3(squeeze(angle(wsmall(i,:,:,:))),Xq,Yq,Zq,'nearest')));
 
-    cmap(i,:,:,:) = interp3(squeeze(abs(cmapsmall(i,:,:,:))),Xq,Yq,Zq,'bilinear').*exp(1i.*interp3(squeeze(angle(cmapsmall(i,:,:,:))),Xq,Yq,Zq,'nearest'));
+for i=1:nc
+    if nz==1
+        wfull(i,:,:,:)= conj(interp2(squeeze(abs(wsmall(i,:,:,:))),Xq,Yq,'bilinear').*exp(1i.*interp2(squeeze(angle(wsmall(i,:,:,:))),Xq,Yq,'nearest')));
+        cmap(i,:,:,:) = interp2(squeeze(abs(cmapsmall(i,:,:,:))),Xq,Yq,'bilinear').*exp(1i.*interp2(squeeze(angle(cmapsmall(i,:,:,:))),Xq,Yq,'nearest'));
+    else
+        wfull(i,:,:,:)= conj(interp3(squeeze(abs(wsmall(i,:,:,:))),Xq,Yq,Zq,'bilinear').*exp(1i.*interp3(squeeze(angle(wsmall(i,:,:,:))),Xq,Yq,Zq,'nearest')));
+        cmap(i,:,:,:) = interp3(squeeze(abs(cmapsmall(i,:,:,:))),Xq,Yq,Zq,'bilinear').*exp(1i.*interp3(squeeze(angle(cmapsmall(i,:,:,:))),Xq,Yq,Zq,'nearest'));
+    end
 end
 recon=squeeze(sum(wfull.*yn));   %Combine coil signals.
 % normalization proposed in the abstract by Griswold et al.

@@ -76,9 +76,7 @@ else
     kspace_sorted = zeros(size(kspace,1),min_lines, size(kspace,3), max(DCEphases));
     traj_sorted = zeros(size(kspace,1),min_lines, 3, max(DCEphases));
     
-    for phase = 1:max(DCEphases)
-        kk = zeros(size(kspace,1),min_lines,3);
-        
+    for phase = 1:max(DCEphases)        
         % check to see which readouts actually fall into our phase
         C = find(DCEphases==phase);
         kspace_sorted(:,:,:,phase) = kspace(:,C(1:min_lines),:);

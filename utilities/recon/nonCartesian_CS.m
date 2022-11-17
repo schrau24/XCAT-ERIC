@@ -72,12 +72,12 @@ end
 delete(gcp('nocreate'))
 
 % calculate weights for respiratory soft-gating and sort
-ntres = 4;
 [nx, nline, nt] = size(Traj_nt);
-nline2 = floor(nline/ntres);
 SoftWeight = ones(nx,nline,nt,nCh);
-respSignal = app.sg_signal(1:nSlcs:end);
 if useSG    % the soft-gating
+    ntres = 4;
+    nline2 = floor(nline/ntres);
+    respSignal = app.sg_signal(1:nSlcs:end);
     Res_Signal_tmp = reshape(respSignal(1:nt*nline),[nline,nt]);
     for ii = 1:nt
         [~,index] = sort(Res_Signal_tmp(:,ii),'descend');

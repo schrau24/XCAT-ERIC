@@ -11,7 +11,9 @@ ylim(app.TrajectoryPlot,[-.5 .5])
 zlim(app.TrajectoryPlot,[-.5 .5])
 
 % normalize kz here for plotting
-k(:,:,3) = k(:,:,3)/max(max(k(:,:,3)))-0.5;
+if nSlcs > 1
+    k(:,:,3) = k(:,:,3)/max(max(k(:,:,3)))-0.5;
+end
 
 for i = 1:nStacksPerFrame
     ind = (i-1)*nSlcs+1:(i*nSlcs);

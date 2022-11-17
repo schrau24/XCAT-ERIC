@@ -48,20 +48,21 @@ if isCartesian
 else    % sort for nonCartesian
     
     % to make all data size the same with no zeros,
-    % find the min number of readouts over all resp frames
+    % find the min number of readouts over all resp frames, and that is a
+    % multiple of nSlcs
+    nSlcs = length(unique(squeeze(app.kz_samples(1,:))));
     min_lines = numel(find(RESPPhases==1));
     for phase = 2:max(RESPPhases)
         if numel(find(RESPPhases==phase)) < min_lines
             min_lines = numel(find(RESPPhases==phase));
         end
     end
+    min_lines = floor(min_lines/nSlcs)*nSlcs;
     
     kspace_sorted = zeros(size(kspace,1),min_lines, size(kspace,3), max(RESPPhases));
     traj_sorted = zeros(size(kspace,1),min_lines, 3, max(RESPPhases));
     
-    for phase = 1:max(RESPPhases)
-        kk = zeros(size(kspace,1),min_lines,3);
-        
+    for phase = 1:max(RESPPhases)        
         % check to see which readouts actually fall into our phase
         C = find(RESPPhases==phase);
         kspace_sorted(:,:,:,phase) = kspace(:,C(1:min_lines),:);

@@ -1,11 +1,14 @@
 function [KXX, KYY, KZZ, interleaves, nArms, nSlcs] = calculateSpiralTraj(app, nArms, origSlcs)
 
 % other parameters are determined from popup inputdlg
-prompt = {'Golden angle (degrees):','aligned (0) or rotating (1):',...
-    'Half scan factor in FH (0.51 to 1):'};
+prompt = {'Golden angle (degrees):','aligned (0) or rotating (1):'};
 dlgtitle = 'Stack-of-spirals parameters';
 dims = [1 50];
-definput = {'222.492','0','1'};
+definput = {'222.492','0'};
+if origSlcs > 3     % only allow half-scan if slices 4 or more
+    prompt = cat(1,prompt, {'Half scan factor in FH (0.51 to 1):'});
+    definput = cat(1,definput,{'1'});
+end
 answer = inputdlg(prompt,dlgtitle,dims,definput);
 
 %%%%% add calculation of one spiral here %%%%%
@@ -50,11 +53,11 @@ GA = str2double(answer{1});
 dangleinc = GA*pi/180;
 
 isRotating = str2double(answer{2});
-Zh  = str2double(answer{3});                    % Half scan in Z
-nSlcs = ceil(origSlcs*Zh);                      % update slices
-if mod(nSlcs,2) == 1                            % make even number of slices
-    nSlcs = nSlcs+1;
+Zh = 1;
+if origSlcs > 3
+    Zh  = str2double(answer{3});                    % Half scan in Z
 end
+nSlcs = ceil(origSlcs*Zh);                          % update slices
 
 % nArms should be a multiple of nSlcs
 nArms = nSlcs*ceil(nArms/nSlcs);
@@ -91,6 +94,9 @@ end
 kz = flip(loc_order,1)';
 % slices to remove for half-scan
 kz(kz<(origSlcs+1-nSlcs)) = [];
+if nSlcs == 1
+    kz = 0;
+end
 kz = repmat(kz,[1 size(KYY,2)/nSlcs]);
 
 KZZ = repmat(kz,[length(k0) 1]);

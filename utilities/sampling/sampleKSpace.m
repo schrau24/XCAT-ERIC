@@ -69,7 +69,7 @@ for currPhase = 1:nPhases
             % build k matrix from all currSpokes
             x = app.kx_samples(:,currSpokes)*app.matrixRL;
             y = app.ky_samples(:,currSpokes)*app.matrixAP;
-            z = (app.kz_samples(:,currSpokes)-app.matrixFH/2);
+            z = app.kz_samples(:,currSpokes)-app.matrixFH/2;
             kloc = cat(3,y,x,z); kloc = permute(kloc, [3 1 2]);
             
             %             % create 3d nufft object and sample

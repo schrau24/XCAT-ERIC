@@ -1,4 +1,4 @@
-function extr2 = SG_RespSort(sg,nPhases)
+function extr2 = RespSort(sg,nPhases)
 
 %% Create range of breathing locations, sort into nPhases resp phases
 sg = smooth(sg,100);

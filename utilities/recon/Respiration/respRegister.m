@@ -2,40 +2,35 @@ function [transforms, tra_table] = respRegister(IMG, app)
 
 %% draw ROI, perform image registration to get translations
 
-% 3D registration of only the pancreas
-recon = squeeze(IMG(:,:,:,1));
-recon = recon/max(recon(:));
-temp = squeeze(abs(recon(:,:,round(size(IMG,3)/2))));
-figure(1); clf; imagesc(temp); colormap gray, axis equal off
-h = drawrectangle(gca);
-pause;
-maskSz = round(h.Position);
-close(figure(1))
+% perform registration on a single sagittal slice chosen by user with
+% user defined ROI
+mag = IMG;
+tmp_mag = mean(mag,4);
 
-% take only the central 50% of slices
-magnitude2 = abs(IMG(maskSz(2):(maskSz(2)+maskSz(4)), maskSz(1):(maskSz(1)+maskSz(3)),...
-    round(0.1*size(IMG,3)):round(0.9*size(IMG,3)),:));
+% use imtool3d, close figure when done and mask is saved
+clear tool 
+tool = imtool3D_3planes(tmp_mag);
+tool.setAspectRatio([app.leftrightRes.Value app.leftrightRes.Value app.footheadRes.Value]) % set voxel size
+msgbox(sprintf('1) select sagittal slice \n2) draw rectangle over area to register \n3) right-click and select poly2mask \n4) close figure'));
+waitfor(tool.getHandles.fig);
+h = tool.getTool;
+mask = single(h.getMask(1));
+%
+% find the sagittal slice that was chosen
+[x,y,z]=ind2sub(size(tmp_mag),find(mask));
+sl = unique(x);
+
+% mask IMG, take only that slice, and perform registration
+mag_mask = squeeze(mag(sl,min(y):max(y), min(z):max(z),:));
 
 clear transforms registered
 for phase = 2:size(IMG,4)
-    fixed = magnitude2(:,:,:,1);
-    moving = magnitude2(:,:,:,phase);
-    [T, RegisteredImage] = registerImages3D(moving,fixed);
-    transforms(:,phase-1) = squeeze(T.T(4,1:3))';    % only store the translational components
-    registered(:,:,:,phase-1) = RegisteredImage;
+    fixed = mag_mask(:,:,1);
+    moving = mag_mask(:,:,phase);
+    [T, RegisteredImage] = registerSagittalImages(moving,fixed);
+    transforms(:,phase-1) = squeeze(T(3,1:2))';    % only store the translational components
+    registered(:,:,phase-1) = RegisteredImage;
 end
-
-% % to view the results
-% a = repmat(rot90(flip(flip(fixed,1),3),-1),[1 1 1 size(IMG,4)]);
-% b = cat(4,rot90(flip(flip(fixed,1),3),-1),rot90(flip(flip(registered,1),3),-1));
-% View4D(cat(2,rot90(flip(flip(magnitude2,1),3),-1),a,b),1,'axisnames',...
-%     {'','','moving, end-expiration, registered'}, 'FigureName','Registration Result',...
-%     'FramePanelTitle','Resp Frames')
-
-transforms = round(transforms,2);
-tra_table = table((2:size(transforms,2)+1)',app.anteriorposteriorRes.Value*squeeze(transforms(1,:))',...
-    app.leftrightRes.Value*squeeze(transforms(2,:))',...
-    app.footheadRes.Value*squeeze(transforms(3,:))',...
-    'VariableNames',{'phase','AP','RL','FH'});
-% report the results
+tra_table = table((1:size(transforms,2))',squeeze(transforms(1,:))',squeeze(transforms(2,:))',...
+    'VariableNames',{'phase','FH','AP'});
 tra_table

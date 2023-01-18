@@ -6,8 +6,8 @@ dlgtitle = 'Stack-of-spirals parameters';
 dims = [1 50];
 definput = {'111.246','0'};
 if origSlcs > 3     % only allow half-scan if slices 4 or more
-    prompt = cat(1,prompt, {'Half scan factor in FH (0.51 to 1):'});
-    definput = cat(1,definput,{'1'});
+    prompt = cat(2,prompt, {'Half scan factor in FH (0.51 to 1):'});
+    definput = cat(2,definput,{'1'});
 end
 answer = inputdlg(prompt,dlgtitle,dims,definput);
 

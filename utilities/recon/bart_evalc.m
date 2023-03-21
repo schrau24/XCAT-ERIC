@@ -59,7 +59,7 @@ function [varargout] = bart_evalc(cmd, varargin)
                 	' ', strrep(out_str, filesep, '/'), '"'];
 		T = evalc('ERR = system(bartstr);');
     else
-        bartstr = [bart_path, '/bart ', cmd, ' ', in_str, ' ', out_str];
+        bartstr = ['nice -n19 ', bart_path, '/bart ', cmd, ' ', in_str, ' ', out_str];
 		T = evalc('ERR = system(bartstr);');
 	end
 

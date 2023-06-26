@@ -25,6 +25,6 @@ if nargout==2
     I(I2) = -I(I2);
     y(I2) = tB*term2*exp(-k*(t(I2)-tB));
 else
-    y(I1) = t(I1).*SpecialCosineExp(k*t(I1), m*t(I1),speedFlag);
-    y(I2) = tB*SpecialCosineExp(k*tB, m*tB,speedFlag)*exp(-k*(t(I2)-tB));
+    y(I1) = t(I1).*SpecialCosineExp(k*t(I1), m*t(I1));
+    y(I2) = tB*SpecialCosineExp(k*tB, m*tB)*exp(-k*(t(I2)-tB));
 end

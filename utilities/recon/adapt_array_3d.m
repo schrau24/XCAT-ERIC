@@ -13,6 +13,9 @@ if nargin<2, rn=eye(nc);end
 % based on image size
 if nx > 162 
     bs = 8; st = 4;
+    if nz/2 < st
+        st = round(nz/2);
+    end
 else
     bs = 4; st = 2;
 end

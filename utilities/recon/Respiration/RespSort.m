@@ -37,7 +37,7 @@ end
 
 c = lines(nPhases);
 if 1
-    figure(1);  clf;
+    figure(100);  clf;
     subplot 211;
     plot(sg,'Color','k'); hold on;  
     x = [1 length(sg)];

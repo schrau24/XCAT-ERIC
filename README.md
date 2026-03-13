@@ -14,11 +14,20 @@ Additional toolboxes:
 * [gpuSparse](https://github.com/marcsous/gpuSparse) and [nufft_3d](https://github.com/marcsous/nufft_3d) from Mark Bydder. Note these are provided with the package but may need to be recompiled within MATLAB
 * [nufft](http://web.eecs.umich.edu/~fessler/code/index.html) from Jeff Fessler and the Michigan Image Reconstruction Toolbox. Note future versions of the phantom will reduce the nufft redundancy.
 * [bart](https://github.com/mrirecon/bart), either on a linux system or using a [Windows-based install](https://bart-doc.readthedocs.io/en/latest/install.html). This code was tested using bart *version 0.4.03*
+  IMPORTANT: to run a compiled version of bart, update the app startupFcn within the mlapp file:
+  1. open MATLAB at the folder containing *MRXCATwERIC.mlapp* and double-click *MRXCATwERIC.mlapp*
+  2. Go to line 266 (startupFcn), and update the following lines of code to match your installation of bart
+     ```
+     % explicitly add bart path, note will change depending on user
+     addpath(genpath('/PATH_TO_TOP_LEVEL_BART/'))
+     setenv('TOOLBOX_PATH','/PATH_TO_TOP_LEVEL_BART/bin')
+     ```
 * [imtool3d](https://github.com/tanguyduval/imtool3D_td) from Tanguy Duval - a really intuitive Matlab-based segmentation tool. Used for motion correction.
 
 To start, open MATLAB at the folder containing *MRXCATwERIC.mlapp* and type:
 ```
 MRXCATwERIC
 ```
+
 
 Additional detailed information can be found in docs/user manual.docx
